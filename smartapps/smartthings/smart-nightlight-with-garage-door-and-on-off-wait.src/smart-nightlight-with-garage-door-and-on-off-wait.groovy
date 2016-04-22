@@ -151,7 +151,7 @@ def contactHandler(evt) {
 	if ((evt.value == "open") && !enabled()) {
         SwitchTurnedOffLight()
     }
-	if ((enabled() || ((contact1.currentContact == "closed") && (contact2.currentContact == "closed"))) && (state.motionevt == "active")) {
+	if (((contact1.currentContact == "closed") && (contact2.currentContact == "closed")) && (state.motionevt == "active")) {
         SwitchTurnedOnLight()
     }
 }
