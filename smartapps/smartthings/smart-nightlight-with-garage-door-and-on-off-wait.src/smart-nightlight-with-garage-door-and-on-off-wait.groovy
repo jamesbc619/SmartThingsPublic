@@ -148,10 +148,10 @@ def SetLigthsStayOffStateAfterDelayMotion() {
 
 def contactHandler(evt) {
 	log.debug "$evt.name: $evt.value"
-	if ((evt.value == "open") && !enabled()) {
+	if ((evt.value == "open") && !enabled() && !state.lightstayoff && !state.lightstayon) {
         SwitchTurnedOffLight()
     }
-	if (((contact1.currentContact == "closed") && (contact2.currentContact == "closed")) && (state.motionevt == "active")) {
+	if (((contact1.currentContact == "closed") && (contact2.currentContact == "closed")) && (state.motionevt == "active") && !state.lightstayoff && !state.lightstayon) {
         SwitchTurnedOnLight()
     }
 }
