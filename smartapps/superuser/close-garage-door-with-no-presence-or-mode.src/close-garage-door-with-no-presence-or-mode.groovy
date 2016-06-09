@@ -45,7 +45,7 @@ preferences {
     	input "arrivingnumber", "number", title: "Minutes? (ex:10)", required: true
   	}
     section("Delay time before canceling close door open after arriving...") {
-    	input "endarrivingnumber", "number", title: "Minutes? (ex:15)", required: true
+    	input "endarrivingnumber", "number", title: "Minutes? (ex:20)", required: true
   	}
 }
 
