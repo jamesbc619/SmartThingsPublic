@@ -14,7 +14,7 @@
  *
  */
 definition(
-    name: "Presence change phrase",
+    name: "Presence change phrase 2.0",
     namespace: "",
     author: "James Clark",
     description: "If you have multiple presence devices per person and if at least one of the devices per person is person or not person. This app will change the phrase.",
@@ -43,6 +43,9 @@ def selectPhrases() {
 				input "phrase2", "enum", title: "Not Present phrase?", options: phrases, required: true
 				}
 		}
+        section("Phrase does not change in this mode") {
+        	input "Mode", "mode", title: "Mode?"
+    	}
     	section("Delay time to change phrase...") {
     		input "threshold1", "number", title: "Minutes", required: true
         }
@@ -85,21 +88,22 @@ private everyoneIsAway2() {
 }
 
 def presence(evt) {
-	if ((evt.value == "present") && !state.present) {
-    	log.trace "Present."
-        state.present = true
-        location.helloHome.execute(settings.phrase1)
-        log.debug "Phrase:${settings.phrase1}"
-        unschedule(notpresent)
-        
-    }
-    else if (everyoneIsAway1() && everyoneIsAway2() && state.present) {
-		log.trace "Not present."
-        state.present = false
-		def threshold1offdelay = threshold1.toInteger() * 60
-		log.debug "runIn($threshold1offdelay)"
-		runIn(threshold1offdelay, notpresent)
-    }
+	if (location.mode != Mode) {
+    	if ((evt.value == "present") && !state.present) {
+    		log.trace "Present."
+        	state.present = true
+        	location.helloHome.execute(settings.phrase1)
+        	log.debug "Phrase:${settings.phrase1}"
+        	unschedule(notpresent)    
+    	}
+    	else if (everyoneIsAway1() && everyoneIsAway2() && state.present) {
+			log.trace "Not present."
+        	state.present = false
+			def threshold1offdelay = threshold1.toInteger() * 60
+			log.debug "runIn($threshold1offdelay)"
+			runIn(threshold1offdelay, notpresent)
+    	}
+	}
 }
 
 def notpresent(evt) {
