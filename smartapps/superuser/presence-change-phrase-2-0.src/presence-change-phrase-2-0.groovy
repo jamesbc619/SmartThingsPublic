@@ -94,15 +94,15 @@ def presence(evt) {
         	state.present = true
         	location.helloHome.execute(settings.phrase1)
         	log.debug "Phrase:${settings.phrase1}"
-        	unschedule(notpresent)    
+        	unschedule(notpresent)        
     	}
-    	else if (everyoneIsAway1() && everyoneIsAway2() && state.present) {
-			log.trace "Not present."
-        	state.present = false
-			def threshold1offdelay = threshold1.toInteger() * 60
-			log.debug "runIn($threshold1offdelay)"
-			runIn(threshold1offdelay, notpresent)
-    	}
+        else if (everyoneIsAway1() && everyoneIsAway2() && state.present) {
+            log.trace "Not present."
+            state.present = false
+            def threshold1offdelay = threshold1.toInteger() * 60
+            log.debug "runIn($threshold1offdelay)"
+            runIn(threshold1offdelay, notpresent)
+        }
 	}
 }
 
