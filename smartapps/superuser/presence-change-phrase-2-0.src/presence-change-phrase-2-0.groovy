@@ -39,12 +39,18 @@ def selectPhrases() {
        		phrases.sort()
        		section("What phrases...") {
 				log.trace phrases
-				input "phrase1", "enum", title: "Present phrase?", options: phrases, required: true
-				input "phrase2", "enum", title: "Not Present phrase?", options: phrases, required: true
+				input "phrase1", "enum", title: "Phrase when Arrived?", options: phrases, required: true
+				input "phrase2", "enum", title: "Phrase when Away?", options: phrases, required: true
 				}
 		}
-        section("Phrase does not change in this mode") {
-        	input "Mode", "mode", title: "Mode?"
+        section("Do not Change Arrived Phrasee if Mode?") {
+        	input "PresentMode", "mode", title: "Mode?", required: true
+    	}
+        section("Does not Change Away Phrasee if Mode?") {
+        	input "NotPresentMode", "mode", title: "Mode?", required: true
+    	}
+        section("Does not Change Phrase at all if Mode?") {
+        	input "VisitorMode", "mode", title: "Mode?", required: true
     	}
     	section("Delay time to change phrase...") {
     		input "threshold1", "number", title: "Minutes", required: true
@@ -55,7 +61,6 @@ def selectPhrases() {
 def installed() {
     subscribe(person1, "presence", presence)
     subscribe(person2, "presence", presence)
-	state.present = true
 }
 
 def updated() {
@@ -88,17 +93,15 @@ private everyoneIsAway2() {
 }
 
 def presence(evt) {
-	if (location.mode != Mode) {
-    	if ((evt.value == "present") && !state.present) {
+	if (location.mode != VisitorMode) {
+    	if ((evt.value == "present") && (location.mode != PresentMode)) {
     		log.trace "Present."
-        	state.present = true
         	location.helloHome.execute(settings.phrase1)
         	log.debug "Phrase:${settings.phrase1}"
         	unschedule(notpresent)        
     	}
-        else if (everyoneIsAway1() && everyoneIsAway2() && state.present) {
+        else if (everyoneIsAway1() && everyoneIsAway2() && (location.mode != NotPresentMode)) {
             log.trace "Not present."
-            state.present = false
             def threshold1offdelay = threshold1.toInteger() * 60
             log.debug "runIn($threshold1offdelay)"
             runIn(threshold1offdelay, notpresent)
