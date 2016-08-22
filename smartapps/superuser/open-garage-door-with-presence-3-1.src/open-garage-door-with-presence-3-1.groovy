@@ -55,9 +55,13 @@ def installed() {
     subscribe(person2, "presence", presence2)
     subscribe(car2, "presence", carpresence2)
 	state.people1car1 = "arrived"
-	state.people2car1 = "arrived"
+    state.people2car1 = "arrived"
     state.people1car2 = "arrived"
 	state.people2car2 = "arrived"
+    state.people1car1wait = "arrived"
+    state.people2car1wait = "arrived"
+    state.people1car2wait = "arrived"
+	state.people2car2wait = "arrived"
     state.iphonepresentnocar1 = "present"
     state.iphonepresentnocar2 = "present"
 	state.carpresentnocar1 = "present"
@@ -73,18 +77,20 @@ def updated() {
 def presence1(evt) {
     log.debug "iPhone1 evt.name: $evt.value"
     if (evt.value == "not present") {
-		if ((car1.currentPresence == "not present").and(state.people2car1 == "arrived").and(state.carpresentnocar1 == "present")) {
+		if ((car1.currentPresence == "not present").and(state.people2car1 == "arrived").and(state.people2car1wait == "arrived").and(state.carpresentnocar1 == "present")) {
 			def offDelay2 = threshold2.toInteger()*60
             log.debug "runIn($offDelay2)"
 			log.trace "Car 1 departed then person 1 waiting"
 			unschedule(carpresentdelay1)
+            state.people1car1wait = "departed"
 			runIn(offDelay2, people1car1departed)
 		}
-		else if ((car2.currentPresence == "not present").and(state.people2car2 == "arrived").and(state.carpresentnocar2 == "present")) {
+		else if ((car2.currentPresence == "not present").and(state.people2car2 == "arrived").and(state.people2car2wait == "arrived").and(state.carpresentnocar2 == "present")) {
 			def offDelay2 = threshold2.toInteger()*60
             log.debug "runIn($offDelay2)"
 			log.trace "Car 2 departed then person 1 waiting"
 			unschedule(carpresentdelay2)
+            state.people1car2wait = "departed"
 			runIn(offDelay2, people1car2departed)
 		}
 		else {
@@ -102,11 +108,13 @@ def presence1(evt) {
     	if ((state.people1car1 == "departed").and(contact1.currentContact == "closed")) {
             log.debug "Person 1 open door 1"
 			state.people1car1 = "arrived"
+            state.people1car1wait = "arrived"
             thedoor1.on()
 		}
     	else if ((state.people1car2 == "departed").and(contact2.currentContact == "closed")) {
 			log.debug "Person 1 open door 2"
 			state.people1car2 = "arrived"
+            state.people1car2wait = "arrived"
             thedoor2.on()
 		}
 	}
@@ -130,19 +138,21 @@ def people1car2departed(evt) {
 def carpresence1(evt) {
 	log.debug "Car1 evt.name: $evt.value"
     if (evt.value == "not present") {
-		if ((person1.currentPresence == "not present").and(state.people1car2 == "arrived").and(state.iphonepresentnocar1 == "present")) {
+		if ((person1.currentPresence == "not present").and(state.people1car2 == "arrived").and(state.people1car2wait == "arrived").and(state.iphonepresentnocar1 == "present")) {
 			def offDelay2 = threshold2.toInteger()*60
             log.debug "runIn($offDelay2)"
 			log.trace "Person 1 departed then car 1 wating"
 			unschedule(iphonepresentdelay1)
-			runIn(offDelay2, people1car1departed)
+			state.people1car1wait = "departed"
+            runIn(offDelay2, people1car1departed)
 		}
-		else if ((person2.currentPresence == "not present").and(state.people2car2 == "arrived").and(state.iphonepresentnocar2 == "present")) {
+		else if ((person2.currentPresence == "not present").and(state.people2car2 == "arrived").and(state.people2car2wait == "arrived").and(state.iphonepresentnocar2 == "present")) {
 			def offDelay2 = threshold2.toInteger()*60
             log.debug "runIn($offDelay2)"
 			log.trace "Person 2 departed then car 1 wating"
 			unschedule(iphonepresentdelay2)
-			runIn(offDelay2, people2car1departed)
+			state.people2car1wait = "departed"
+            runIn(offDelay2, people2car1departed)
 		}
 		else {
 			log.debug "Car 1 not present no person waiting"
@@ -160,6 +170,8 @@ def carpresence1(evt) {
 			state.carpresentnocar1 = "present"
             state.people1car1 = "arrived"
         	state.people2car1 = "arrived"
+            state.people1car1wait = "arrived"
+        	state.people2car1wait = "arrived"
         	if (contact1.currentContact == "closed") {
         		log.debug "Car 1 open door 1"
             	/*thedoor1.on()*/
@@ -176,18 +188,20 @@ def carpresentdelay1(evt) {
 def presence2(evt) {
     log.debug "iPhone2 evt.name: $evt.value"
     if (evt.value == "not present") {
-		if ((car2.currentPresence == "not present").and(state.people1car2 == "arrived").and(state.carpresentnocar2 == "present")) {
+		if ((car2.currentPresence == "not present").and(state.people1car2 == "arrived").and(state.people1car2wait == "arrived").and(state.carpresentnocar2 == "present")) {
 			def offDelay2 = threshold2.toInteger()*60
             log.debug "runIn($offDelay2)"
 			log.trace "Car 2 departed then person 2 waiting"
 			unschedule(carpresentdelay2)
-			runIn(offDelay2, people2car2departed)
+			state.people2car2wait = "departed"
+            runIn(offDelay2, people2car2departed)
 		}
-		else if ((car1.currentPresence == "not present").and(state.people1car1 == "arrived").and(state.carpresentnocar1 == "present")) {
+		else if ((car1.currentPresence == "not present").and(state.people1car1 == "arrived").and(state.people1car1wait == "arrived").and(state.carpresentnocar1 == "present")) {
 			def offDelay2 = threshold2.toInteger()*60
             log.debug "runIn($offDelay2)"
 			log.trace "Car 1 departed then person 2 waiting"
 			unschedule(carpresentdelay1)
+            state.people2car1wait = "departed"
 			runIn(offDelay2, people2car1departed)
 		}
 		else {
@@ -203,11 +217,13 @@ def presence2(evt) {
     	if ((state.people2car2 == "departed").and(contact2.currentContact == "closed")) {
             log.debug "Person 2 open door 2"
 			state.people2car2 = "arrived"
+            state.people2car2wait = "arrived"
             thedoor2.on()
 		}
     	else if ((state.people2car1 == "departed").and(contact1.currentContact == "closed")) {
 			log.debug "Person 2 open door 1"
 			state.people2car1 = "arrived"
+            state.people2car1wait = "arrived"
             thedoor1.on()
 		}
 	}
@@ -231,19 +247,21 @@ def people2car1departed(evt) {
 def carpresence2(evt) {
     log.debug "Car2 evt.name: $evt.value"
     if (evt.value == "not present") {
-		if ((person2.currentPresence == "not present").and(state.people2car1 == "arrived").and(state.iphonepresentnocar2 == "present")) {
+		if ((person2.currentPresence == "not present").and(state.people2car1 == "arrived").and(state.people2car1wait == "arrived").and(state.iphonepresentnocar2 == "present")) {
 			def offDelay2 = threshold2.toInteger()*60
             log.debug "runIn($offDelay2)"
 			log.trace "Person 2 departed then car 2 waiting"
 			unschedule(iphonepresentdelay2)
+            state.people2car2wait = "departed"
 			runIn(offDelay2, people2car2departed)
 		}
-		else if ((person1.currentPresence == "not present").and(state.people1car1 == "arrived").and(state.iphonepresentnocar1 == "present")) {
+		else if ((person1.currentPresence == "not present").and(state.people1car1 == "arrived").and(state.people1car1wait == "arrived").and(state.iphonepresentnocar1 == "present")) {
 			def offDelay2 = threshold2.toInteger()*60
             log.debug "runIn($offDelay2)"
 			log.trace "Person 1 departed then car 2 waiting"
 			unschedule(iphonepresentdelay1)
-			runIn(offDelay2, people1car2departed)
+			state.people1car2wait = "departed"
+            runIn(offDelay2, people1car2departed)
 		}
 		else {
 			log.debug "Car 2 not present no person waiting"
@@ -261,6 +279,8 @@ def carpresence2(evt) {
 			state.carpresentnocar2 = "present"
         	state.people2car2 = "arrived"
         	state.people1car2 = "arrived"
+            state.people2car2wait = "arrived"
+        	state.people1car2wait = "arrived"
             if (contact2.currentContact == "closed") {
            		log.debug "Car 2 open door 2"
            		/*thedoor2.on()*/

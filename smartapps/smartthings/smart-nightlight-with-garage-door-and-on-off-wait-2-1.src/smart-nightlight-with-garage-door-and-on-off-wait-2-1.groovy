@@ -16,7 +16,7 @@
  *
  */
 definition(
-    name: "Smart Nightlight with Garage Door and On / Off wait 2.0",
+    name: "Smart Nightlight with Garage Door and On / Off wait 2.1",
     namespace: "smartthings",
     author: "SmartThings",
     description: "Turns on lights when it's dark and motion is detected. Turns lights off when it becomes light or some time after motion ceases.",
