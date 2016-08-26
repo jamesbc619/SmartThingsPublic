@@ -17,7 +17,7 @@ definition(
     name: "Presence change phrase 2.0",
     namespace: "",
     author: "James Clark",
-    description: "If you have multiple presence devices per person and if at least one of the devices per person is person or not person. This app will change the phrase.",
+    description: "If you have multiple presence devices per person and if at least one of the devices per person is person or not presence. This app will change the phrase if the selected mode is not set.",
     category: "Safety & Security",
     iconUrl: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience.png",
     iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png",

@@ -44,7 +44,7 @@ preferences {
     section("Delay time before door closes after arriving when no montion...") {
     	input "arrivingnumber", "number", title: "Minutes? (ex:10)", required: true
   	}
-    section("Delay time before canceling close door open after arriving...") {
+    section("Delay time before canceling close door after arriving...") {
     	input "endarrivingnumber", "number", title: "Minutes? (ex:20)", required: true
   	}
 }
@@ -86,7 +86,7 @@ def carpresence1(evt) {
     log.debug "carpresence1: $evt.value"            
     if (evt.value == "present") {
 		state.arrivedclosing1 = true
-       log.trace "Car 1 arrived waiting to end close door 1."
+        log.trace "Car 1 arrived waiting to end close door 1."
     	def endarrivingnumberdelay = endarrivingnumber.toInteger() * 60
     	log.debug "runIn($endarrivingnumberdelay)"
         runIn(endarrivingnumberdelay, endarrivingcar1)
@@ -115,6 +115,7 @@ def carpresence2(evt) {
    	else {
     	state.arrivedclosing2 = false
 		log.trace "Car 2 no present closing garage door 2."
+        turnonswitchcar2()
 	}  
 }
 
