@@ -17,7 +17,7 @@ definition(
     name: "Presence change phrase",
     namespace: "",
     author: "James Clark",
-    description: "If you have multiple presence devices per person and if at least one of the devices per person is person or not person. This app will change the phrase.",
+    description: "If you have multiple presence devices per person and if at least one of the devices per person is person or not presence. This app will change the phrase if the selected mode is not set.",
     category: "Safety & Security",
     iconUrl: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience.png",
     iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png",
@@ -39,10 +39,19 @@ def selectPhrases() {
        		phrases.sort()
        		section("What phrases...") {
 				log.trace phrases
-				input "phrase1", "enum", title: "Present phrase?", options: phrases, required: true
-				input "phrase2", "enum", title: "Not Present phrase?", options: phrases, required: true
+				input "phrase1", "enum", title: "Phrase when Arrived?", options: phrases, required: true
+				input "phrase2", "enum", title: "Phrase when Away?", options: phrases, required: true
 				}
 		}
+        section("Do not Change Arrived Phrasee if Mode?") {
+        	input "PresentMode", "mode", title: "Mode?", required: true
+    	}
+        section("Does not Change Away Phrasee if Mode?") {
+        	input "NotPresentMode", "mode", title: "Mode?", required: true
+    	}
+        section("Does not Change Phrase at all if Mode?") {
+        	input "VisitorMode", "mode", title: "Mode?", required: true
+    	}
     	section("Delay time to change phrase...") {
     		input "threshold1", "number", title: "Minutes", required: true
         }
@@ -52,7 +61,6 @@ def selectPhrases() {
 def installed() {
     subscribe(person1, "presence", presence)
     subscribe(person2, "presence", presence)
-	state.present = true
 }
 
 def updated() {
@@ -85,21 +93,20 @@ private everyoneIsAway2() {
 }
 
 def presence(evt) {
-	if ((evt.value == "present") && !state.present) {
-    	log.trace "Present."
-        state.present = true
-        location.helloHome.execute(settings.phrase1)
-        log.debug "Phrase:${settings.phrase1}"
-        unschedule(notpresent)
-        
-    }
-    else if (everyoneIsAway1() && everyoneIsAway2() && state.present) {
-		log.trace "Not present."
-        state.present = false
-		def threshold1offdelay = threshold1.toInteger() * 60
-		log.debug "runIn($threshold1offdelay)"
-		runIn(threshold1offdelay, notpresent)
-    }
+	if (location.mode != VisitorMode) {
+    	if ((evt.value == "present") && (location.mode != PresentMode)) {
+    		log.trace "Present."
+        	location.helloHome.execute(settings.phrase1)
+        	log.debug "Phrase:${settings.phrase1}"
+        	unschedule(notpresent)        
+    	}
+        else if (everyoneIsAway1() && everyoneIsAway2() && (location.mode != NotPresentMode)) {
+            log.trace "Not present."
+            def threshold1offdelay = threshold1.toInteger() * 60
+            log.debug "runIn($threshold1offdelay)"
+            runIn(threshold1offdelay, notpresent)
+        }
+	}
 }
 
 def notpresent(evt) {
