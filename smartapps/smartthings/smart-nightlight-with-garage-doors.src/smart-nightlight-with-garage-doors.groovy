@@ -71,8 +71,8 @@ def updated() {
 def initialize() {
 	subscribe(motionSensor, "motion", motionHandler)
     subscribe(lights, "switch", switchHandler)
-    subscribe(contact1, "contact", contactHandler1)
-    subscribe(contact2, "contact", contactHandler2)
+    subscribe(contact1, "contact", contactHandler)
+    subscribe(contact2, "contact", contactHandler)
 	subscribe(location, "position", locationPositionChange)
 	subscribe(location, "sunriseTime", sunriseSunsetTimeHandler)
 	subscribe(location, "sunsetTime", sunriseSunsetTimeHandler)
@@ -100,8 +100,7 @@ def motionHandler(evt) {
         unsubscribe (SetLigthsStayOffStateAfterDelay)
         log.trace "state.lightstayoff = $state.lightstayoff"
         log.trace "state.lightstayon = $state.lightstayon"
-/*        if ((enabled() || ((contact1.currentContact == "closed") && (contact2.currentContact == "closed"))) && !state.lightstayoff && !state.lightstayon) { */
-        if ((enabled() || (contact1.currentContact == "closed")) && !state.lightstayoff && !state.lightstayon)  {
+        if ((enabled() || ((contact1.currentContact == "closed") && (contact2.currentContact == "closed"))) && !state.lightstayoff && !state.lightstayon) {
 			log.debug "turning on lights due to motion"
 			lights.on()
 			state.lastStatus = "on"
@@ -152,7 +151,7 @@ def SetLigthsStayOffStateAfterDelayMotion() {
 	state.lightstayoff = false
 }
 
-def contactHandler1(evt) {
+def contactHandler(evt) {
 	log.debug "$evt.name: $evt.value"
 	if (evt.value == "open" && !state.lightstayoff && !state.lightstayon) {
     	if (!enabled()) {
@@ -165,30 +164,9 @@ def contactHandler1(evt) {
 			runIn(delayMinutes*60, turnOffMotionAfterDelay, [overwrite: false])
 		}
 	}
-/*	if (((contact1.currentContact == "closed") && (contact2.currentContact == "closed")) && (state.motionevt == "active") && !state.lightstayoff && !state.lightstayon) {
-        SwitchTurnedOnLight()
-    }*/
-    if ((contact1.currentContact == "closed") && (state.motionevt == "active") && !state.lightstayoff && !state.lightstayon) {
+	if (((contact1.currentContact == "closed") && (contact2.currentContact == "closed")) && (state.motionevt == "active") && !state.lightstayoff && !state.lightstayon) {
         SwitchTurnedOnLight()
     }
-}
-
-def contactHandler2(evt) {
-	log.debug "$evt.name: $evt.value"
-	if (evt.value == "open" && !state.lightstayoff && !state.lightstayon) {
-/*    	if (!enabled()) {
-        	SwitchTurnedOffLight()
-        }*/
-        if (enabled()) {
-			log.debug "turning on lights due to door open"
-			SwitchTurnedOnLight()
-            state.motionevt = "inactive"
-			runIn(delayMinutes*60, turnOffMotionAfterDelay, [overwrite: false])
-		}
-	}
-/*	if (((contact1.currentContact == "closed") && (contact2.currentContact == "closed")) && (state.motionevt == "active") && !state.lightstayoff && !state.lightstayon) {
-        SwitchTurnedOnLight()
-    }*/
 }
 
 def scheduleCheck() {
