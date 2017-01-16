@@ -200,21 +200,21 @@ def presence2(evt) {
     if (evt.value == "not present") {
 		log.debug "People 2 Car 2 Disable Count ($state.car2disablecount)"
     	log.debug "People 2 Car 1 Disable Count ($state.car1disablecount)"
-        if ((car2.currentPresence == "not present").and(state.people1car2 == "arrived").and(state.people1car2wait == "arrived").and(state.carpresentnocar2 == "present").and(state.car2disablecount < disablecount1)) {
-			def offDelay2 = threshold2.toInteger()*60
-            log.debug "runIn($offDelay2)"
-			log.trace "Car 2 departed then person 2 waiting"
-			unschedule(carpresentdelay2)
-			state.people2car2wait = "departed"
-            runIn(offDelay2, people2car2departed)
-		}
-		else if ((car1.currentPresence == "not present").and(state.people1car1 == "arrived").and(state.people1car1wait == "arrived").and(state.carpresentnocar1 == "present").and(state.car1disablecount < disablecount1)) {
+        if ((car1.currentPresence == "not present").and(state.people1car1 == "arrived").and(state.people1car1wait == "arrived").and(state.carpresentnocar1 == "present").and(state.car1disablecount < disablecount1)) {
 			def offDelay2 = threshold2.toInteger()*60
             log.debug "runIn($offDelay2)"
 			log.trace "Car 1 departed then person 2 waiting"
 			unschedule(carpresentdelay1)
             state.people2car1wait = "departed"
 			runIn(offDelay2, people2car1departed)
+		}
+        else if ((car2.currentPresence == "not present").and(state.people1car2 == "arrived").and(state.people1car2wait == "arrived").and(state.carpresentnocar2 == "present").and(state.car2disablecount < disablecount1)) {
+			def offDelay2 = threshold2.toInteger()*60
+            log.debug "runIn($offDelay2)"
+			log.trace "Car 2 departed then person 2 waiting"
+			unschedule(carpresentdelay2)
+			state.people2car2wait = "departed"
+            runIn(offDelay2, people2car2departed)
 		}
 		else {
 			log.debug "Person 2 not present no car waiting"
