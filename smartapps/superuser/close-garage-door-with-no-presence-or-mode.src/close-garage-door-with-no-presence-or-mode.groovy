@@ -70,12 +70,12 @@ def updated() {
 
 def modechangehandler(evt) {
     log.debug "mode changed to ${evt.value}"
-    if (location.mode == modes) {
-    	if ((contact1.currentContact == "open") && !state.arrivedclosing1) {
+    if (evt.value == modes)  {
+    	if ((contact1.currentContact == "open") && (state.motiontimer == "inactive") && !state.arrivedclosing1) {
         	log.trace "Mode change to ${evt.value} closing door 1."
             turnonswitchcar1()
 		}            
-    	if ((contact2.currentContact == "open") && !state.arrivedclosing2) {
+    	if ((contact2.currentContact == "open") && (state.motiontimer == "inactive") && !state.arrivedclosing2) {
         	log.trace "Mode change to ${evt.value} closing door 2."
             turnonswitchcar2()
 		}            

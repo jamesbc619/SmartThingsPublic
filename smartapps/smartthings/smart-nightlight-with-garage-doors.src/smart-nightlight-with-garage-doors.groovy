@@ -99,6 +99,7 @@ def motionHandler(evt) {
     log.trace "state.lightstayon = $state.lightstayon"
     if (evt.value == "active") {
         state.motionevt = "active"
+        unsubscribe (MotionevtState)
         unsubscribe (TurnoffSwitchContactMontion)
         unsubscribe (SetLigthsStayOffStateAfterDelay)
         unsubscribe (SetLigthsStayOnStateAfterDelay)
@@ -113,6 +114,7 @@ def motionHandler(evt) {
 	else {
         state.motionevt = "inactive"
         state.motionStopTime = now()
+        runIn(3, MotionevtState)
         if(delayMinutes && !state.lightstayoff && !state.lightstayon) {
             runIn(delayMinutes*60, turnOffMotionAfterDelay, [overwrite: false])
         }
@@ -126,6 +128,10 @@ def motionHandler(evt) {
             turnOffMotionAfterDelay()
         }
     }
+}
+
+def MotionevtState() {
+	state.motionevt = "inactive"
 }
 
 def SetLigthsStayOnStateAfterDelayMotion() {
