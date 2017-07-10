@@ -26,7 +26,6 @@ definition(
 
 preferences {
 	section("Garage Door 1...") {
-		input "contact1", "capability.contactSensor", title: "Which door sensor?", required: true
 		input "thedoor1", "capability.switch", title: "Which door switch?", required: true
     }
 	section("When mode changes close garage door...") {
@@ -39,7 +38,6 @@ preferences {
 
 def installed() {
 	log.debug "Installed with settings: ${settings}"
-    subscribe(contact1, "contact", contacthandler1)
 	subscribe(motion, "motion", motionhandler)
     subscribe(location, "mode", modechangehandler)
     state.motiontimer = "inactive"
@@ -54,9 +52,9 @@ def updated() {
 def modechangehandler(evt) {
     log.debug "mode changed to ${evt.value}"
     if (evt.value == modes)  {
-    	if ((contact1.currentContact == "open") && (state.motiontimer == "inactive")) {
+    	if (state.motiontimer == "inactive") {
         	log.trace "Mode change to ${evt.value} closing door 1."
-            turnonswitch1()
+            thedoor1.on()
 		}                     
     }
 }
@@ -78,11 +76,4 @@ def motionhandler(evt) {
 def motionHandlerinactive() {
 	state.motiontimer = "inactive"
 	log.trace "Motion timer done inactive"
-}
-
-def turnonswitch1() {
-    if ((contact1.currentContact == "open") && (state.motiontimer == "inactive")) {
-    	log.trace "Closing door 1."
-        thedoor1.on()
-	}
 }
