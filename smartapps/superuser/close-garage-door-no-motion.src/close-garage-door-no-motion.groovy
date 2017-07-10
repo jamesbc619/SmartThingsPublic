@@ -32,10 +32,6 @@ preferences {
 		input "contact1", "capability.contactSensor", title: "Which Sensor?"
 		input "thedoor1", "capability.switch", title: "Which Door?"
 	}
-    section("Close if small garage door is open...") {
-		input "contact2", "capability.contactSensor", title: "Which Sensor?"
-		input "thedoor2", "capability.switch", title: "Which Door?"
-	}
     section("Timeout Delay Before Garage Door Close") {
         input "threshold", "number", title: "Minutes? (ex:30)"
     }
@@ -49,19 +45,13 @@ def installed()
 {
     subscribe(motion1, "motion", NoMotioneventHandler)
     subscribe(contact1, "contact", ContactHandler1)
-    subscribe(contact2, "contact", ContactHandler2)
     state.counter1 = 1
-    state.counter2 = 1
 }
 
 def updated()
 {
 	unsubscribe()
-    subscribe(motion1, "motion", NoMotioneventHandler)
-    subscribe(contact1, "contact", ContactHandler1)
-    subscribe(contact2, "contact", ContactHandler2)
-    state.counter1 = 1
-    state.counter2 = 1
+	installed()
 }
 
 def NoMotioneventHandler(evt) {
@@ -70,19 +60,12 @@ def NoMotioneventHandler(evt) {
         if (evt.value == "active") {
         	log.debug "Cancelling previous close door task..."
        		unschedule(TurnOnSwitch1)
-            unschedule(TurnOnSwitch2)
     	}
         if ((motion1.currentMotion == "inactive").and(contact1.currentContact == "open")) {
         	log.trace "Waiting to close garage door 1 with montion."
     		def offDelay = threshold.toInteger() * 60
         	log.debug "runIn($offDelay)"
         	runIn(offDelay, TurnOnSwitch1)
-		}
-        if ((motion1.currentMotion == "inactive").and(contact2.currentContact == "open")) {
-        	log.trace "Waiting to close garage door 2 with montion."
-    		def offDelay = threshold.toInteger() * 60
-        	log.debug "runIn($offDelay)"
-        	runIn(offDelay, TurnOnSwitch2)
 		}
 }
 
@@ -101,21 +84,6 @@ def ContactHandler1(evt) {
 	}
 }
 
-def ContactHandler2(evt) {
-	log.debug "$evt.value: $evt, $settings"
-    if (contact2.currentContact == "closed") {
-    	log.trace "Garge Door 2 Contact Was Closed"
-    	unschedule(TurnOnSwitch2)
-    }
-    if (contact2.currentContact == "open") {
-    	log.trace "Garge Door 2 Contact Was Open"
-        log.trace "Waiting to close garage door 2 with contact."
-    	def offDelay = threshold.toInteger() * 60
-        log.debug "runIn($offDelay)"
-        runIn(offDelay, TurnOnSwitch2)
-	}
-}  
-
 def TurnOnSwitch1(evt) {
 	log.debug "state.counter1 = ${state.counter1}"
     if (contact1.currentContact == "closed") {
@@ -126,8 +94,6 @@ def TurnOnSwitch1(evt) {
     else if ((contact1.currentContact == "open").and(state.counter1 <= numberoftimes.toInteger())) {
     	log.trace "Wait done, closing large garage door."
 		thedoor1.on()
-        pause(2000)
-		thedoor1.off()
         state.counter1 = state.counter1 + 1
         def offDelay2 = threshold2.toInteger() * 60
         log.debug "runIn($offDelay2)"
@@ -136,28 +102,5 @@ def TurnOnSwitch1(evt) {
 	else if ((contact1.currentContact == "open").and(state.counter1 > numberoftimes.toInteger())) {
         state.counter1 = 1
         log.trace "Garge Door 1 did not close"
-	}
-}
-
-def TurnOnSwitch2(evt) {
-	log.debug "state.counter2 = ${state.counter2}"
-    if (contact2.currentContact == "closed") {
-    	log.trace "Garge Door 2 closed"
-        state.counter2 = 1
-        unschedule(TurnOnSwitch2)
-    }
-    else if ((contact2.currentContact == "open").and(state.counter2 <= numberoftimes.toInteger())) {
-    	log.trace "Wait done, closing small garage door."
-		thedoor2.on()
-        pause(2000)
-		thedoor2.off()
-        state.counter2 = state.counter2 + 1
-        def offDelay2 = threshold2.toInteger() * 60
-        log.debug "runIn($offDelay2)"
-        runIn(offDelay2, TurnOnSwitch2)
-	}
-	else if ((contact2.currentContact == "open").and(state.counter2 > numberoftimes.toInteger())) {
-        state.counter2 = 1
-        log.trace "Garge Door 2 did not close"
 	}
 }
