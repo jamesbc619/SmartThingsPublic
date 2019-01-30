@@ -18,8 +18,9 @@
  *
  *  Version history
  */
-def version() {	return "v0.3.16e.20171219" }
+def version() {	return "v0.3.16f.20180908" }
 /*
+ *	09/08/2018 >>> v0.3.16f.20180908 - RC - Fixed blank screens while creating or editing pistons caused by a minor incompatibility with Groovy upgrade
  *	12/19/2017 >>> v0.3.16e.20171219 - RC - Replaced recovery safety nets using unschedule() with a much more optimized method that does not affect ST as much as unschedule() does
  *	08/28/2017 >>> v0.3.16d.20170828 - RC - Fixed a problem where the value for emergencyHeat() was mistakenly set to "emergencyHeat" instead of "emergency heat" - thanks @RBoy
  *	06/07/2017 >>> v0.3.16c.20170607 - RC - Extended setVideoLength to 120s for Blink cameras
@@ -854,7 +855,7 @@ private getConditionGroupPageContent(params, condition) {
 	try {
 		if (condition) {
 			def id = (int) condition.id
-			def pid = (int) condition.parentId ? (int) condition.parentId : (int)condition.id
+			def pid = condition.parentId ? (int) condition.parentId : (int)condition.id
 			def nextLevel = (int) (condition.level ? condition.level : 0) + 1
 			def cnt = 0
 			section() {
@@ -3480,7 +3481,7 @@ private getLastConditionId(parent) {
 private createAction(parentId, onState = true, actionId = null) {
 	def action = [:]
 	//give the new condition an id
-	action.id = (int) actionId == null ? getNextActionId() : actionId
+	action.id = actionId == null ? getNextActionId() : actionId
 	action.pid = (int) parentId
 	action.rs = !!onState
 	state.config.app.actions.push(action)
