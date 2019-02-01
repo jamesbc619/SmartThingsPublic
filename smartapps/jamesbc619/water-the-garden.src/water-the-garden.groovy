@@ -37,10 +37,6 @@ preferences {
         input "sunsetOffsetValue", "text", title: "HH:MM", required: false
         input "sunsetOffsetDir", "enum", title: "Before or After", required: false, options: ["Before","After"]
     }
-    section ("Zip code (optional, defaults to location coordinates)...") {
-        input "zipCode", "text", required: false
-    }
-
 }
 
 def installed() {
@@ -62,15 +58,7 @@ def initialize() {
     scheduleWithOffset(location.currentValue("sunsetTime"), sunsetOffsetValue, sunsetOffsetDir, "sunsetHandler")
     scheduleWithOffset(location.currentValue("sunriseTime"), sunriseOffsetValue, sunriseOffsetDir, "sunriseHandler")
     
-    def s = getSunriseAndSunset(zipCode: zipCode, sunriseOffset: state.sunriseOffset, sunsetOffset: state.sunsetOffset)
-    def now = new Date()
-    def riseTime = s.sunrise
-    def setTime = s.sunset
-    if(riseTime.before(now) || setTime.after(now)) {   
-		//before midnight/after sunset or after midnight/before sunset
-	  	log.info "Sun is up"
-        sunriseHandler()
-	}
+    sunriseHandler()
 }
 
 def locationPositionChange(evt) {
