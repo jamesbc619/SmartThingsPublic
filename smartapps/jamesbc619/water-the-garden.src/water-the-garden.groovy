@@ -58,7 +58,30 @@ def initialize() {
     scheduleWithOffset(location.currentValue("sunsetTime"), sunsetOffsetValue, sunsetOffsetDir, "sunsetHandler")
     scheduleWithOffset(location.currentValue("sunriseTime"), sunriseOffsetValue, sunriseOffsetDir, "sunriseHandler")
     
-    sunriseHandler()
+    startUp()
+}
+
+def startUp() {
+	def now = new Date()
+    def sunriseOffset = getOffsetMinuts(sunriseOffsetValue, sunriseOffsetDir)
+	def sunsetOffset = getOffsetMinuts(sunsetOffsetValue, sunsetOffsetDir)
+    def SunriseAndSunse = getSunriseAndSunset(sunriseOffset: sunriseOffset, sunsetOffset: sunsetOffset)
+    if(SunriseAndSunse.sunrise.before(now) && SunriseAndSunse.sunset.after(now)) {   
+		//before midnight/after sunset or after midnight/before sunset
+	  	log.info "Sun is Up"
+        sunriseHandler()
+	}
+    else {
+    	log.info "Sun is Down"
+    }
+}
+
+private getOffsetMinuts(String offsetValue, String offsetDir) {
+	def timeOffsetMinuts = offsetValue
+	if (offsetDir == "Before") {
+		return "-" + timeOffsetMinuts
+	}
+	return timeOffsetMinuts
 }
 
 def locationPositionChange(evt) {
