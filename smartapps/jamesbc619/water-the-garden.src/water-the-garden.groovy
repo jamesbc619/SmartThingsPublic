@@ -123,14 +123,28 @@ def turnOn() {
     if (state.dayTime == true) { 
 		log.info "Switch On"
         switches.on()
-        //caluculate time till off
-        def timeOff = minutesHour.toInteger() * 60
-        log.info "Waiting $timeOff Sec Switch Off"
-		runIn(timeOff, turnOff)
+        log.info "Waiting 15 Sec to Turn Switch On Again"
+		runIn(15, turnOnAgain)
 	}
 }
 
+def turnOnAgain() {	 
+    log.info "Switch On"
+    switches.on()
+    //caluculate time till off
+    def timeOff = minutesHour.toInteger() * 60
+    log.info "Waiting $timeOff Sec Switch Off"
+    runIn(timeOff, turnOff)
+}
+
 def turnOff() {
+    log.info "Switch Off"
+    switches.off()
+    log.info "Waiting 15 Sec to Turn Switch Off Again"
+    runIn(15, turnOffAgain)
+}
+
+def turnOffAgain() {
     log.info "Switch Off"
     switches.off()
 	if (state.dayTime == true) {
