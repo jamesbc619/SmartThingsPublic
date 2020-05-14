@@ -83,8 +83,10 @@ def astroCheck() {
 	state.riseTime = s.sunrise.time
 	state.setTime = s.sunset.time
 	log.debug "rise: ${new Date(state.riseTime)}($state.riseTime), set: ${new Date(state.setTime)}($state.setTime)"
-    def timeBeforeSunset = new Date(state.setTime)
-    runOnce(timeBeforeSunset, turnOn)
+    def timeSunset = new Date(state.setTime)
+    runOnce(timeSunset, turnOn)
+    def timeSunrise = new Date(state.riseTime)
+    runOnce(timeSunrise, turnOffLights)
 }
 
 private enabled() {

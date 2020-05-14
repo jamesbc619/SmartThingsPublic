@@ -139,6 +139,7 @@ def turnOnAgain() {
 
 def turnOff() {
     log.info "Switch Off"
+    unschedule(turnOn)
     switches.off()
     log.info "Waiting 15 Sec to Turn Switch Off Again"
     runIn(15, turnOffAgain)
