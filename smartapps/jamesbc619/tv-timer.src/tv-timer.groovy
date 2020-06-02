@@ -93,10 +93,8 @@ def adjustTime() {
             runIn(warningOnTime, flashLights)
         }
         else {
-            if (state.warningSwitchTurnedOn == false) {
-                log.debug "Adjust time on: Flash warning lights now($warningOnTime)"
-                flashLights()
-			}                
+            log.debug "Adjust time on: Flash warning lights now($warningOnTime)"
+            flashLights()              
         }
         runIn(turnOffTime, turnOffRemote)
     }
