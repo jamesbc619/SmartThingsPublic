@@ -44,6 +44,7 @@ def installed() {
 	log.debug "Installed with settings: ${settings}"
     resetTimerHandler()
 	initialize()
+    state.warningSwitchTurnedOn = false
 }
 
 def updated() {
@@ -58,7 +59,6 @@ def initialize() {
     state.onMinutesSec = onMinutes*60
     subscribe(remoteSwitchs, "switch", remoteSwitchHandler)
     schedule(resetTime, resetTimerHandler)
-    state.warningSwitchTurnedOn = false
     adjustTime()
     //resetTimerHandler()
 }
@@ -70,11 +70,6 @@ def adjustTime() {
         state.remoteTurnedOff = true
     }
     else {
-        if (state.warningSwitchTurnedOn) {
-            log.debug "Warnig Switchs off"
-            warningSwitch.off()
-            state.warningSwitchTurnedOn = false
-		}
         log.debug "Adjust time: remote on"
         //state.startTime = new Date().getTime()
         log.debug "Adjust time: state.startTime($state.startTime)"
@@ -88,13 +83,15 @@ def adjustTime() {
         def warningMinutes = warningMinutes ?: 5
         def secWarningMinutes = warningMinutes * 60
         def warningOnTime = turnOffTime - secWarningMinutes
+        state.startTime = new Date().getTime()
         if (turnOffTime > secWarningMinutes) {
+            if (state.warningSwitchTurnedOn) {
+                log.debug "Warnig Switchs off"
+                warningSwitch.off()
+                state.warningSwitchTurnedOn = false
+			}
             log.debug "Adjust time on: Waiting to flash warning lights($warningOnTime)"
             runIn(warningOnTime, flashLights)
-        }
-        else {
-            log.debug "Adjust time on: Flash warning lights now($warningOnTime)"
-            flashLights()              
         }
         runIn(turnOffTime, turnOffRemote)
     }

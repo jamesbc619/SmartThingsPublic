@@ -45,7 +45,7 @@ def installed() {
 
 def updated() {
     unsubscribe()
-    unschedule()
+//    unschedule()
     initialize()
 }
 
@@ -110,12 +110,16 @@ def scheduleWithOffset(nextSunriseSunsetTime, offset, offsetDir, handlerName) {
 def sunriseHandler() {
     log.info "Executing sunrise handler"
     state.dayTime = true
+    unschedule(turnOn)
+    unschedule(turnOff)
 	turnOn()
 }
 
 def sunsetHandler() {
     log.info "Executing sunset handler"
 	state.dayTime = false
+    unschedule(turnOn)
+    unschedule(turnOff)
     turnOff()
 }
 
@@ -139,7 +143,6 @@ def turnOnAgain() {
 
 def turnOff() {
     log.info "Switch Off"
-    unschedule(turnOn)
     switches.off()
     log.info "Waiting 15 Sec to Turn Switch Off Again"
     runIn(15, turnOffAgain)
