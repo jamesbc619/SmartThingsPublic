@@ -71,7 +71,11 @@ def adjustTime() {
     }
     else {
         log.debug "Adjust time: remote on"
-        //state.startTime = new Date().getTime()
+        if (state.startTime == $null)
+        {
+        	log.debug "Adjust time: state.startTime was null"
+            state.startTime = new Date().getTime()
+        }
         log.debug "Adjust time: state.startTime($state.startTime)"
         def diffTimeUsed = new Date().getTime() - state.startTime
         def diffTimeUsedSec = Math.round(diffTimeUsed / 1000)
